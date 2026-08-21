@@ -1,0 +1,50 @@
+[
+  {
+    "id": "portfolioJobMonitorErrorDemoV1",
+    "name": "Job Monitor — Sanitized Error Preview",
+    "active": false,
+    "nodes": [
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1,
+        "position": [-420, 40],
+        "id": "33333333-3333-4333-8333-333333333301",
+        "name": "Error Trigger"
+      },
+      {
+        "parameters": {
+          "jsCode": "const execution = $json.execution ?? {};\nconst workflow = $json.workflow ?? {};\nconst safeWorkflow = String(workflow.name ?? 'Job Monitor').slice(0, 120);\nconst safeExecution = String(execution.id ?? 'unknown').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 80);\nconst safeNode = String(execution.lastNodeExecuted ?? 'unknown').replace(/[\\r\\n\\t]/g, ' ').slice(0, 120);\n\nreturn [{\n  json: {\n    delivery_mode: 'preview_only',\n    message: [\n      'Job monitor failed',\n      `Workflow: ${safeWorkflow}`,\n      `Execution: ${safeExecution}`,\n      `Last node: ${safeNode}`,\n      'Inspect the private n8n execution log. Error details are intentionally omitted from this alert.'\n    ].join('\\n')\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [-160, 40],
+        "id": "33333333-3333-4333-8333-333333333302",
+        "name": "Build Sanitized Alert Preview"
+      },
+      {
+        "parameters": {
+          "content": "## Sanitized error preview\nReceives failed-execution context, keeps only safe identifiers, and builds an operator alert. This public demo does not include a Slack credential or send a message.",
+          "height": 440,
+          "width": 700,
+          "color": 2
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [-500, -180],
+        "id": "33333333-3333-4333-8333-333333333303",
+        "name": "Section - Sanitized error preview"
+      }
+    ],
+    "connections": {
+      "Error Trigger": {
+        "main": [[{"node": "Build Sanitized Alert Preview", "type": "main", "index": 0}]]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "timezone": "UTC",
+      "saveManualExecutions": true
+    }
+  }
+]

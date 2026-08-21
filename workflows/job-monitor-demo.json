@@ -1,0 +1,167 @@
+[
+  {
+    "id": "portfolioJobMonitorDemoV1",
+    "name": "Job Monitor — Offline Recruiter Demo",
+    "active": false,
+    "nodes": [
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [-1320, 40],
+        "id": "11111111-1111-4111-8111-111111111101",
+        "name": "Manual Trigger"
+      },
+      {
+        "parameters": {
+          "jsCode": "return [\n  { json: { source: 'Demo ATS', source_id: 'DEMO-001', title: 'Workflow Automation Specialist', company: 'Northstar Services', location: 'Remote', description: 'Build n8n workflows, connect business tools, and improve implementation processes.', listed_on: '2026-08-20' } },\n  { json: { source: 'Demo ATS', source_id: 'DEMO-002', title: 'AI Implementation Consultant', company: 'Cedar Labs', location: 'Hybrid', description: 'Lead client onboarding, systems integration, and repeatable delivery workflows.', listed_on: '2026-08-19' } },\n  { json: { source: 'Demo ATS', source_id: 'DEMO-003', title: 'Software Engineer', company: 'Harbor Systems', location: 'Remote', description: 'Develop backend services and maintain application infrastructure.', listed_on: '2026-08-18' } },\n  { json: { source: 'Demo ATS', source_id: 'DEMO-004', title: 'n8n Automation Builder', company: 'Brightway Studio', location: 'Remote', description: 'Create automation workflows and support process improvement projects.', listed_on: '2026-08-17' } },\n  { json: { source: 'Demo ATS', source_id: 'DEMO-005', title: 'Sales Operations Analyst', company: 'Summit Works', location: 'On-site', description: 'Prepare reports, maintain forecasts, and coordinate sales planning.', listed_on: '2026-08-16' } }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [-1100, 40],
+        "id": "11111111-1111-4111-8111-111111111102",
+        "name": "Fictional Job Listings"
+      },
+      {
+        "parameters": {
+          "jsCode": "function clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nreturn $input.all().map((item) => {\n  const source = clean(item.json.source);\n  const sourceId = clean(item.json.source_id);\n  const title = clean(item.json.title);\n  return {\n    json: {\n      record_key: `${source.toLowerCase().replace(/[^a-z0-9]+/g, '-')}:${sourceId}`,\n      source,\n      source_id: sourceId,\n      title,\n      normalized_title: title.toLowerCase(),\n      company: clean(item.json.company),\n      location: clean(item.json.location),\n      description: clean(item.json.description),\n      listed_on: clean(item.json.listed_on)\n    }\n  };\n});"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [-880, 40],
+        "id": "11111111-1111-4111-8111-111111111103",
+        "name": "Standardize Listings"
+      },
+      {
+        "parameters": {
+          "jsCode": "const titleTerms = ['automation', 'implementation', 'workflow', 'n8n'];\nconst supportingTerms = ['integration', 'client onboarding', 'process improvement'];\nconst threshold = 2;\n\nreturn $input.all().map((item) => {\n  const title = item.json.normalized_title;\n  const details = `${title} ${item.json.description.toLowerCase()}`;\n  const titleHits = titleTerms.filter((term) => title.includes(term));\n  const supportingHits = supportingTerms.filter((term) => details.includes(term));\n  const score = (titleHits.length * 2) + supportingHits.length;\n  const reasons = [\n    ...titleHits.map((term) => `title contains ${term}`),\n    ...supportingHits.map((term) => `details contain ${term}`)\n  ];\n  return {\n    json: {\n      ...item.json,\n      match_status: score >= threshold ? 'matched' : 'not_matched',\n      match_score: score,\n      match_reasons: reasons\n    }\n  };\n});"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [-560, 40],
+        "id": "11111111-1111-4111-8111-111111111104",
+        "name": "Apply Fixed Matching Rules"
+      },
+      {
+        "parameters": {
+          "jsCode": "const fictionalExistingKeys = new Set(['demo-ats:DEMO-004']);\n\nreturn $input.all()\n  .filter((item) => item.json.match_status === 'matched')\n  .map((item) => ({\n    json: {\n      ...item.json,\n      record_status: fictionalExistingKeys.has(item.json.record_key) ? 'existing' : 'new'\n    }\n  }));"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [-320, 40],
+        "id": "11111111-1111-4111-8111-111111111105",
+        "name": "Classify Existing Records"
+      },
+      {
+        "parameters": {
+          "jsCode": "return $input.all()\n  .filter((item) => item.json.record_status === 'new')\n  .map((item, index) => ({\n    json: {\n      ...item.json,\n      preview_record_id: `PREVIEW-${String(index + 1).padStart(3, '0')}`,\n      proposed_action: 'would_save_and_verify',\n      database_write_performed: false\n    }\n  }));"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [-40, 40],
+        "id": "11111111-1111-4111-8111-111111111106",
+        "name": "Prepare Verified Preview"
+      },
+      {
+        "parameters": {
+          "jsCode": "const discovered = $items('Standardize Listings');\nconst evaluated = $items('Apply Fixed Matching Rules');\nconst matched = $items('Classify Existing Records');\nconst newRoles = $input.all();\nconst duplicates = matched.filter((item) => item.json.record_status === 'existing');\n\nconst roleLines = newRoles.map((item) => `• ${item.json.title} — ${item.json.company}`);\nconst message = [\n  'Job Monitor offline preview',\n  `${newRoles.length} new fictional match(es) would be saved and verified.`,\n  ...roleLines,\n  'No database write or Slack message was performed.'\n].join('\\n');\n\nreturn [{\n  json: {\n    run_mode: 'offline_preview',\n    discovered_count: discovered.length,\n    matched_count: evaluated.filter((item) => item.json.match_status === 'matched').length,\n    duplicate_count: duplicates.length,\n    new_match_count: newRoles.length,\n    database_write_performed: false,\n    slack_message_sent: false,\n    new_roles: newRoles.map((item) => ({ title: item.json.title, company: item.json.company })),\n    slack_message_preview: message\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [260, 40],
+        "id": "11111111-1111-4111-8111-111111111107",
+        "name": "Build Slack Message Preview"
+      },
+      {
+        "parameters": {
+          "content": "## 1. Collect and standardize\nCreates five fictional listings and converts them into the same set of fields. The demo makes no network requests.",
+          "height": 520,
+          "width": 680,
+          "color": 5
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [-1400, -220],
+        "id": "22222222-2222-4222-8222-222222222201",
+        "name": "Section 1 - Collect and standardize"
+      },
+      {
+        "parameters": {
+          "content": "## 2. Apply fixed matching rules\nUses visible terms and a fixed threshold. Every result records the reasons behind its score.",
+          "height": 520,
+          "width": 300,
+          "color": 4
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [-700, -220],
+        "id": "22222222-2222-4222-8222-222222222202",
+        "name": "Section 2 - Apply fixed rules"
+      },
+      {
+        "parameters": {
+          "content": "## 3. Identify duplicates\nCompares matching listings with one fictional existing record. Previously seen jobs are classified instead of recreated.",
+          "height": 520,
+          "width": 280,
+          "color": 6
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [-380, -220],
+        "id": "22222222-2222-4222-8222-222222222203",
+        "name": "Section 3 - Identify duplicates"
+      },
+      {
+        "parameters": {
+          "content": "## 4. Preview verified records\nShows which new records a live workflow would save and read back. No database is contacted in this public demo.",
+          "height": 520,
+          "width": 280,
+          "color": 3
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [-80, -220],
+        "id": "22222222-2222-4222-8222-222222222204",
+        "name": "Section 4 - Preview verified records"
+      },
+      {
+        "parameters": {
+          "content": "## 5. Preview the Slack summary\nBuilds the same kind of concise result message used by the deployed workflow, but does not send it.",
+          "height": 520,
+          "width": 340,
+          "color": 2
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [220, -220],
+        "id": "22222222-2222-4222-8222-222222222205",
+        "name": "Section 5 - Preview Slack summary"
+      }
+    ],
+    "connections": {
+      "Manual Trigger": {
+        "main": [[{"node": "Fictional Job Listings", "type": "main", "index": 0}]]
+      },
+      "Fictional Job Listings": {
+        "main": [[{"node": "Standardize Listings", "type": "main", "index": 0}]]
+      },
+      "Standardize Listings": {
+        "main": [[{"node": "Apply Fixed Matching Rules", "type": "main", "index": 0}]]
+      },
+      "Apply Fixed Matching Rules": {
+        "main": [[{"node": "Classify Existing Records", "type": "main", "index": 0}]]
+      },
+      "Classify Existing Records": {
+        "main": [[{"node": "Prepare Verified Preview", "type": "main", "index": 0}]]
+      },
+      "Prepare Verified Preview": {
+        "main": [[{"node": "Build Slack Message Preview", "type": "main", "index": 0}]]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "timezone": "UTC",
+      "saveManualExecutions": true
+    }
+  }
+]

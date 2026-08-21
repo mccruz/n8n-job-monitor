@@ -1,0 +1,19 @@
+{
+  "run_mode": "offline_preview",
+  "discovered_count": 5,
+  "matched_count": 3,
+  "duplicate_count": 1,
+  "new_match_count": 2,
+  "database_write_performed": false,
+  "slack_message_sent": false,
+  "new_roles": [
+    {
+      "title": "Workflow Automation Specialist",
+      "company": "Northstar Services"
+    },
+    {
+      "title": "AI Implementation Consultant",
+      "company": "Cedar Labs"
+    }
+  ]
+}

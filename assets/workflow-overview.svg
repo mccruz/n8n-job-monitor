@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
+  <title id="title">n8n Job Monitor workflow overview</title>
+  <desc id="desc">Five stages move approved job feeds through standardization, fixed matching, duplicate checks, save verification, and Slack reporting, with a separate error-alert path.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7faf9"/>
+      <stop offset="1" stop-color="#edf5f1"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#173a32" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#55756b"/>
+    </marker>
+  </defs>
+  <rect width="1280" height="640" rx="28" fill="url(#bg)"/>
+  <text x="64" y="72" fill="#173a32" font-family="Inter, Arial, sans-serif" font-size="36" font-weight="700">Job Monitor in n8n</text>
+  <text x="64" y="110" fill="#55756b" font-family="Inter, Arial, sans-serif" font-size="19">A deterministic path from public listings to verified, human-reviewable results</text>
+
+  <g stroke="#55756b" stroke-width="3" fill="none" marker-end="url(#arrow)">
+    <path d="M260 300 H284"/>
+    <path d="M494 300 H518"/>
+    <path d="M728 300 H752"/>
+    <path d="M962 300 H986"/>
+  </g>
+
+  <g filter="url(#shadow)" font-family="Inter, Arial, sans-serif">
+    <rect x="50" y="190" width="210" height="220" rx="20" fill="#ffffff" stroke="#c8ddd5"/>
+    <circle cx="92" cy="234" r="22" fill="#dff2ea"/>
+    <text x="92" y="242" text-anchor="middle" fill="#1f6b55" font-size="22" font-weight="700">1</text>
+    <text x="78" y="286" fill="#173a32" font-size="20" font-weight="700">Collect</text>
+    <text x="78" y="315" fill="#173a32" font-size="20" font-weight="700">and standardize</text>
+    <text x="78" y="354" fill="#55756b" font-size="16">Approved public feeds</text>
+    <text x="78" y="378" fill="#55756b" font-size="16">One consistent format</text>
+
+    <rect x="284" y="190" width="210" height="220" rx="20" fill="#ffffff" stroke="#c8ddd5"/>
+    <circle cx="326" cy="234" r="22" fill="#e6effa"/>
+    <text x="326" y="242" text-anchor="middle" fill="#315f91" font-size="22" font-weight="700">2</text>
+    <text x="312" y="286" fill="#173a32" font-size="20" font-weight="700">Test safely</text>
+    <text x="312" y="315" fill="#173a32" font-size="20" font-weight="700">and compare</text>
+    <text x="312" y="354" fill="#55756b" font-size="16">Preview without writes</text>
+    <text x="312" y="378" fill="#55756b" font-size="16">Find existing records</text>
+
+    <rect x="518" y="190" width="210" height="220" rx="20" fill="#ffffff" stroke="#c8ddd5"/>
+    <circle cx="560" cy="234" r="22" fill="#f4ead8"/>
+    <text x="560" y="242" text-anchor="middle" fill="#8b642a" font-size="22" font-weight="700">3</text>
+    <text x="546" y="286" fill="#173a32" font-size="20" font-weight="700">Choose new</text>
+    <text x="546" y="315" fill="#173a32" font-size="20" font-weight="700">matches</text>
+    <text x="546" y="354" fill="#55756b" font-size="16">Fixed, explainable rules</text>
+    <text x="546" y="378" fill="#55756b" font-size="16">Skip duplicates</text>
+
+    <rect x="752" y="190" width="210" height="220" rx="20" fill="#ffffff" stroke="#c8ddd5"/>
+    <circle cx="794" cy="234" r="22" fill="#eee7f7"/>
+    <text x="794" y="242" text-anchor="middle" fill="#6c4c91" font-size="22" font-weight="700">4</text>
+    <text x="780" y="286" fill="#173a32" font-size="20" font-weight="700">Save and</text>
+    <text x="780" y="315" fill="#173a32" font-size="20" font-weight="700">confirm</text>
+    <text x="780" y="354" fill="#55756b" font-size="16">Read records back</text>
+    <text x="780" y="378" fill="#55756b" font-size="16">Preserve review state</text>
+
+    <rect x="986" y="190" width="244" height="220" rx="20" fill="#ffffff" stroke="#c8ddd5"/>
+    <circle cx="1028" cy="234" r="22" fill="#f9e4e8"/>
+    <text x="1028" y="242" text-anchor="middle" fill="#9a4354" font-size="22" font-weight="700">5</text>
+    <text x="1014" y="286" fill="#173a32" font-size="20" font-weight="700">Send confirmed</text>
+    <text x="1014" y="315" fill="#173a32" font-size="20" font-weight="700">results to Slack</text>
+    <text x="1014" y="354" fill="#55756b" font-size="16">One concise summary</text>
+    <text x="1014" y="378" fill="#55756b" font-size="16">Only after final checks</text>
+  </g>
+
+  <path d="M635 410 V474 H986" fill="none" stroke="#b45d6b" stroke-width="3" stroke-dasharray="7 7" marker-end="url(#arrow)"/>
+  <rect x="986" y="456" width="244" height="96" rx="16" fill="#fff8f8" stroke="#e4b9c1"/>
+  <text x="1014" y="494" fill="#8e3547" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700">If an execution fails</text>
+  <text x="1014" y="522" fill="#6d5560" font-family="Inter, Arial, sans-serif" font-size="15">Send a sanitized operator alert</text>
+
+  <text x="64" y="585" fill="#55756b" font-family="Inter, Arial, sans-serif" font-size="16">Public demo: fictional data · no credentials · no network · no database writes · no messages sent</text>
+</svg>
