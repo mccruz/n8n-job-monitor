@@ -1,8 +1,28 @@
 # n8n Job Monitor
 
-An n8n workflow that collects job listings, finds relevant roles with visible
-rules, prevents duplicates, verifies saved records, and reports confirmed
-results to Slack.
+An n8n demonstration of turning repeated job-feed checks into one organized
+review summary. It helps a job seeker decide what to review next while keeping
+applications and career decisions with the person.
+
+## Example result
+
+**Synthetic offline result:** five listings become three matches. One was
+already recorded, leaving two new roles for review:
+
+| Role to review | Fictional company |
+| --- | --- |
+| Workflow Automation Specialist | Northstar Services |
+| AI Implementation Consultant | Cedar Labs |
+
+The preview performs **zero database writes and zero Slack sends**. See the
+[exact output](examples/expected-preview.json). The public demo illustrates the
+workflow; the architecture documents the separate deployed integration.
+
+## My contribution
+
+I designed the collection-to-review workflow, stable record identity, and
+verification-before-notification approach, then built this fictional demo for
+inspection without access to private systems.
 
 [![n8n](https://img.shields.io/badge/built%20with-n8n-EA4B71.svg)](https://n8n.io/)
 [![Demo](https://img.shields.io/badge/demo-offline%20and%20credential--free-2D6A4F.svg)](docs/demo-guide.md)
@@ -10,19 +30,12 @@ results to Slack.
 
 ![Five-stage view of the job monitor, from approved feeds to verified Slack results](assets/workflow-overview.svg)
 
-## Review this project in 3 minutes
+<a id="review-this-project-in-3-minutes"></a>
 
-No setup is required:
+## Explore the project
 
-1. Follow the diagram from job collection to the Slack summary.
-2. Read [How it works](#how-it-works) and
-   [Safety and reliability](#safety-and-reliability).
-3. Open the [architecture notes](docs/architecture.md),
-   [demo guide](docs/demo-guide.md), or
-   [verification record](docs/verification.md) for technical detail.
-
-The public workflow was imported and executed in a disposable,
-network-disabled n8n container. Running n8n locally is optional.
+Start with the example above, then follow the diagram and the
+[engineering evidence](#engineering-evidence). Setup is optional for review.
 
 ## The problem
 
@@ -42,16 +55,13 @@ applications and career decisions to a person.
 A separate error workflow creates a short failure alert. Detailed errors stay
 in the private n8n execution log instead of being copied into Slack.
 
-## What this demonstrates
+## Engineering evidence
 
-| Need | Workflow response |
-| --- | --- |
-| Job feeds use different formats | Standardize listings before matching or storage |
-| Search rules should be understandable | Use fixed terms and visible match reasons |
-| The same role may appear again | Create a stable key and check existing records |
-| A save can partly fail | Read records back before reporting success |
-| Testing should not change live data | Provide a preview with writes and messages disabled |
-| Failures should be visible | Route them through a sanitized error workflow |
+| Capability | Implementation | Check |
+| --- | --- | --- |
+| Match and identify existing roles | [Workflow Code nodes](workflows/job-monitor-demo.json) | [Calculated output and edge cases](scripts/check-workflows.mjs) |
+| Reproduce the preview offline | [Graph execution harness](scripts/workflow-harness.mjs) | [Expected result](examples/expected-preview.json) |
+| Keep public artifacts credential-free | [Workflow checker](scripts/check-workflows.mjs) | [Verification record](docs/verification.md) |
 
 ## Safety and reliability
 
